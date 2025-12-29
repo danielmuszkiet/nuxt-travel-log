@@ -1,37 +1,36 @@
-import { createAuthClient } from "better-auth/client";
+import { createAuthClient } from "better-auth/vue";
 
 const authClient = createAuthClient();
 
 export const useAuthStore = defineStore("useAuthStore", () => {
-  const loading = ref(false);
+  const session = authClient.useSession();
+
   const redirecting = ref(false);
+  const loading = computed(() => session.value.isPending || session.value.isRefetching || redirecting.value);
+  const user = computed(() => session.value.data?.user);
 
   const signInWithGithub = async () => {
-    loading.value = true;
-    redirecting.value = false;
-
+    redirecting.value = true;
     try {
-      // start social login (performs a redirect)
-      redirecting.value = true;
       await authClient.signIn.social({
         provider: "github",
         callbackURL: "/dashboard",
         errorCallbackURL: "/error",
       });
     }
-    catch (err) {
-      console.error("Login fehlgeschlagen", err);
+    catch {
       redirecting.value = false;
-    }
-    finally {
-      // If no redirect occurs, reset
-      if (!redirecting.value)
-        loading.value = false;
     }
   };
 
+  const signOut = async () => {
+    await authClient.signOut();
+  };
+
   return {
+    user,
     loading,
     signInWithGithub,
+    signOut,
   };
 });
