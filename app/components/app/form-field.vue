@@ -1,9 +1,10 @@
 <script setup lang="ts">
-const { error, name, label, type } = defineProps<{
+const { error, name, label, type, disabled } = defineProps<{
   label: string;
   error?: string;
   name: string;
   type: "text" | "textarea" | "number";
+  disabled?: boolean;
 }>();
 </script>
 
@@ -18,6 +19,7 @@ const { error, name, label, type } = defineProps<{
       class="input w-full"
       :name="name"
       :class="{ 'input-error': error }"
+      :disabled="disabled"
     />
 
     <Field
@@ -26,6 +28,7 @@ const { error, name, label, type } = defineProps<{
       class="textarea w-full"
       :name="name"
       :class="{ 'input-error': error }"
+      :disabled="disabled"
     />
 
     <p v-if="error" class="label text-error">
