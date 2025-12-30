@@ -11,7 +11,8 @@ const route = useRoute();
 
 <template>
   <NuxtLink
-    :to="href" class="flex flex-nowrap whitespace-nowrap justify-start items-center gap-2 p-2 hover:bg-base-300 hover:cursor-pointer"
+    :to="href"
+    class="flex flex-nowrap whitespace-nowrap justify-start items-center gap-2 p-2 hover:bg-base-300 hover:cursor-pointer"
     :data-tip="label"
     :class="{ 'bg-base-300': route.path === href,
               'tooltip tooltip-right': !showLabel,
