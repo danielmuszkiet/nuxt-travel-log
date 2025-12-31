@@ -4,6 +4,7 @@ import type { FetchError } from "ofetch";
 import { InsertLocationSchema } from "~~/server/lib/db/schema";
 
 const submitError = ref("");
+const submitted = ref(false);
 const loading = ref(false);
 const router = useRouter();
 
@@ -17,6 +18,8 @@ const onSubmit = handleSubmit(async (value) => {
     loading.value = true;
 
     await $fetch("/api/locations", { method: "POST", body: value });
+    submitted.value = true;
+    navigateTo("/dashboard");
   }
   catch (e) {
     const error = e as FetchError;
@@ -31,7 +34,7 @@ const onSubmit = handleSubmit(async (value) => {
 });
 
 onBeforeRouteLeave(() => {
-  if (meta.value.dirty) {
+  if (!submitted.value && meta.value.dirty) {
     // eslint-disable-next-line no-alert
     const confirm = window.confirm("Are your sure you want to leave? All unsaved changes will be lost");
     if (!confirm) {
@@ -71,7 +74,7 @@ onBeforeRouteLeave(() => {
           label="Description"
           :error="errors.description"
           type="textarea"
-          name="desription"
+          name="description"
           :disabled="loading"
         />
 

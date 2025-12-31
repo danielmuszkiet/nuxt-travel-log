@@ -1,5 +1,5 @@
 import { int, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
 
 import { user } from "./auth";
 
@@ -15,15 +15,11 @@ export const location = sqliteTable("location", {
   updatedAt: int().notNull().$default(() => Date.now()).$onUpdate(() => Date.now()),
 });
 
-export const InsertLocationSchema = createInsertSchema(location, {
-  name: field => field.min(1).max(100),
-  description: field => field.max(1000),
-  lat: field => field.min(-90).max(90),
-  long: field => field.min(-180).max(180),
-}).omit({
-  id: true,
-  slug: true,
-  userId: true,
-  createdAt: true,
-  updatedAt: true,
+export const InsertLocationSchema = z.object({
+  name: z.string().min(1, "Name cannot be empty").max(100, "Maximum 100 characters"),
+  description: z.string().max(1000, "Maximum 1000 characters").optional(),
+  lat: z.number().min(-90, "Latitude must be ≥ -90").max(90, "Latitude must be ≤ 90"),
+  long: z.number().min(-180, "Longitude must be ≥ -180").max(180, "Longitude must be ≤ 180"),
 });
+
+export type InsertLocation = z.infer<typeof InsertLocationSchema>;
