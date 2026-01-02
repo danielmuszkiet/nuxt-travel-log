@@ -1,23 +1,7 @@
 import type { LibsqlError } from "@libsql/client";
 
-import { and, eq } from "drizzle-orm";
-import { customAlphabet } from "nanoid";
-import slugify from "slug";
-
-import db from "../lib/db";
-import { InsertLocationSchema, location } from "../lib/db/schema";
-
-const nanoid = customAlphabet("1234567890abcdefghijklmnopqrstuvwxyz", 5);
-async function generateUniqueSlug(name: string) {
-  const slug = slugify(name);
-  let suffix = "";
-
-  while (await db.query.location.findFirst({ where: eq(location.slug, slug + suffix) })) {
-    suffix = `-${nanoid()}`;
-  }
-
-  return slug + suffix;
-}
+import { findLocationByName, findUniqueSlugFromName, insertLocation } from "../lib/db/queries/location";
+import { InsertLocationSchema } from "../lib/db/schema";
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
@@ -51,12 +35,7 @@ export default defineEventHandler(async (event) => {
     }));
   }
 
-  const existingLocation = await db.query.location.findFirst({
-    where: and(
-      eq(location.userId, event.context.user.id),
-      eq(location.name, result.data.name),
-    ),
-  });
+  const existingLocation = await findLocationByName(result.data, event.context.user.id);
 
   if (existingLocation) {
     sendError(
@@ -69,16 +48,10 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  const slug = await generateUniqueSlug(result.data.name);
+  const slug = await findUniqueSlugFromName(result.data.name);
 
   try {
-    const [created] = await db.insert(location).values({
-      ...result.data,
-      slug,
-      userId: event.context.user.id,
-    }).returning();
-
-    return created;
+    return insertLocation(result.data, slug, event.context.user.id);
   }
   catch (e) {
     const error = e as LibsqlError;
@@ -91,6 +64,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    throw e; // optional
+    throw e;
   }
 });
