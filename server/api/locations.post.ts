@@ -44,11 +44,11 @@ export default defineEventHandler(async (event) => {
         return errors;
       }, {} as Record<string, string>);
 
-    throw createError({
+    throw sendError(event, createError({
       statusCode: 422,
       statusMessage,
       data,
-    });
+    }));
   }
 
   const existingLocation = await db.query.location.findFirst({
