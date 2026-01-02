@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1766845897445,
-      "tag": "0000_redundant_puppet_master",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1766917369610,
-      "tag": "0001_cloudy_hardball",
+      "when": 1767189748177,
+      "tag": "0000_burly_banshee",
       "breakpoints": true
     }
   ]
