@@ -59,10 +59,10 @@ export default defineEventHandler(async (event) => {
   });
 
   if (existingLocation) {
-    throw sendError(event, createError({
+    throw createError({
       statusCode: 409,
       statusMessage: "Location with this name already exists for you!",
-    }));
+    });
   }
 
   const slug = await generateUniqueSlug(result.data.name);

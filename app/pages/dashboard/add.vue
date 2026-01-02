@@ -30,7 +30,7 @@ const onSubmit = handleSubmit(async (value) => {
     }
     console.log(e);
 
-    submitError.value = error.statusMessage || "An unknown error occured.";
+    submitError.value = error.statusMessage || error.message || "An unknown error occured.";
   }
   finally {
     loading.value = false;
