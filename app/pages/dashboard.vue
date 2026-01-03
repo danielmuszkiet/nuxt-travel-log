@@ -1,8 +1,11 @@
 <script setup lang="ts">
 const isSidebarOpen = ref(true);
+const sidebarStore = useSidebarStore();
+const locationStore = useLocationStore();
 
 onMounted(() => {
   isSidebarOpen.value = localStorage.getItem("isSidebarOpen") !== "false";
+  locationStore.refresh();
 });
 
 function toggleSidebar() {
@@ -25,6 +28,7 @@ function toggleSidebar() {
         <Icon v-if="isSidebarOpen" name="tabler:layout-sidebar-left-collapse-filled" size="24" />
         <Icon v-else name="tabler:layout-sidebar-left-expand-filled" size="24" />
       </div>
+
       <div class="flex flex-col gap-1">
         <SidebarButton
           :show-label="isSidebarOpen"
@@ -38,6 +42,25 @@ function toggleSidebar() {
           icon="tabler:circle-plus-filled"
           href="/dashboard/add"
         />
+
+        <div v-show="sidebarStore.isLoading || sidebarStore.sidebarItems.length" class="divider" />
+
+        <div v-show="sidebarStore.isLoading" class="px-2">
+          <div class="skeleton h-7 " />
+        </div>
+
+        <div v-show="sidebarStore.sidebarItems.length" class="flex flex-col">
+          <ClientOnly>
+            <SidebarButton
+              v-for="item in sidebarStore.sidebarItems"
+              :key="item.id"
+              :label="item.label"
+              :icon="item.icon"
+              :href="item.href"
+              :show-label="isSidebarOpen"
+            />
+          </ClientOnly>
+        </div>
 
         <div class="divider" />
 
